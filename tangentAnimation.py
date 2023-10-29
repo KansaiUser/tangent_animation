@@ -52,4 +52,17 @@ ax.plot(X, Y, marker='o', markersize=3, linestyle='-')
 tangent = plt.quiver(x_tangent, y_tangent, dx, dy, color='red', angles='xy',
           scale_units='xy', scale=1, width=0.005)
 
+
+def animate(frame):
+    tangent_vector = calculate_unit_tangent_vector(frame)
+    x_tangent, y_tangent = X[frame], Y[frame]
+    dx, dy = tangent_vector
+    # tangent.set_UVC(dx-x_tangent,dy-y_tangent)
+    tangent.set_UVC(dx, dy)
+    tangent.set_offsets([x_tangent, y_tangent])
+    
+    return tangent,
+
+animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1), blit=True)
+
 plt.show()
