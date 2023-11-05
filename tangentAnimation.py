@@ -40,16 +40,17 @@ x_tangent, y_tangent = X[start_frame], Y[start_frame]
 dx, dy = tangent_vector
 
 fig, ax = plt.subplots()
-ax.set_xlim(-1.5, 1.5)
-ax.set_ylim(-2.0, 2.0)
+
+ax.plot(X, Y, marker='o', markersize=3, linestyle='-')
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_title('Circular Trajectory with Sinusoidal Oscillation of X and Y')
-ax.grid(True)
 ax.axis('equal')
+ax.set_xlim(-1.5, 1.5)
+ax.set_ylim(-2.0, 2.0)
+ax.grid(True)
 
-ax.plot(X, Y, marker='o', markersize=3, linestyle='-')
 tangent = plt.quiver(x_tangent, y_tangent, dx, dy, color='red', angles='xy',
                      scale_units='xy', scale=1, width=0.005)
 
