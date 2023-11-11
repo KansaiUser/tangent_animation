@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.animation import FuncAnimation
 
 # 1. Code to get data for trajectory
 
@@ -86,7 +87,7 @@ height = 4
 # function to calculate the instantaneous rectangle
 def calculate_rectangle(XD, YD, XC, YC):
     theta = np.arctan2(YD, XD)
-    print("Angle:",math.degrees(theta))
+    print("Angle:", math.degrees(theta))
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
 
@@ -95,14 +96,14 @@ def calculate_rectangle(XD, YD, XC, YC):
                    XC - 0.5 * width * cos_theta + 0.5 * height * sin_theta,
                    XC + 0.5 * width * cos_theta + 0.5 * height * sin_theta,
                    XC + 0.5 * width * cos_theta - 0.5 * height * sin_theta]
-    
+
     rectangle_y = [YC + 0.5 * width * sin_theta + 0.5 * height * cos_theta,
                    YC - 0.5 * width * sin_theta + 0.5 * height * cos_theta,
                    YC - 0.5 * width * sin_theta - 0.5 * height * cos_theta,
                    YC + 0.5 * width * sin_theta - 0.5 * height * cos_theta,
                    YC + 0.5 * width * sin_theta + 0.5 * height * cos_theta]
 
-    return rectangle_x,rectangle_y
+    return rectangle_x, rectangle_y
 
 
 # 3. Start feature
@@ -120,7 +121,7 @@ rectangle_x, rectangle_y = calculate_rectangle(XD, YD, XC, YC)
 fig, ax = plt.subplots()
 ax.plot(data['X'], data['Y'],color='b')
 ax.plot(data['XL'], data['YL'],color='r')
-ax.plot(data['XR'],data['YR'],color='g')
+ax.plot(data['XR'], data['YR'],color='g')
 ax.axis('equal')
 ax.grid(True)
 
@@ -131,13 +132,37 @@ if tangent_vector is not None:
     dx, dy = tangent_vector
     tangent = ax.quiver(x_tangent, y_tangent, dx, dy, color='violet', angles='xy', scale_units='xy', scale=1, width=0.005)
 
+car = ax.scatter(XC, YC, color='r')
+rec1, = ax.plot(rectangle_x, rectangle_y, color='purple')
+# rec2 = ax.fill(rectangle_x, rectangle_y, color='purple', alpha=0.4)
 
-rec1 = ax.plot(rectangle_x, rectangle_y, color='purple')
-rec2 = ax.fill(rectangle_x, rectangle_y, color='purple', alpha=0.4)
+
+# 5. Modifies rec1,rec2 and tangent_vector
+# receives frame
+def animate(frame):
+    tangent_vector = calculate_unit_tangent_vector(frame)
+    # x_tangent, y_tangent = X[frame], Y[frame]
+    # dx, dy = tangent_vector
+    XC, YC = X[frame], Y[frame]
+    XD, YD = tangent_vector
+    rectangle_x, rectangle_y = calculate_rectangle(XD, YD, XC, YC)
+
+    car.set_offsets([XC, YC])
+
+    tangent.set_UVC(XD, YD)
+    tangent.set_offsets([XC, YC])
+    rec1.set_data(rectangle_x, rectangle_y)
+    # rec2.set_data(rectangle_x, rectangle_y)
+    # rec2.get_paths()[0].vertices[:, 0] = rectangle_x
+    # rec2.get_paths()[0].vertices[:, 1] = rectangle_y
+
+    return tangent, car, rec1,# rec2,
+
+
+animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1),
+                          blit=True)
 
 
 plt.show()
-
-
 
 
