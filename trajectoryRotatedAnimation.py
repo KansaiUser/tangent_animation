@@ -34,12 +34,19 @@ data = pd.DataFrame({'fr': frame_numbers, 'X': X, 'Y': Y, 'XL': XL, 'YL': YL,
 
 # function to calculate the unit tangent vector
 def calculate_unit_tangent_vector(frame_number):
-    if frame_number < 0 or frame_number >= num_points:
+    # if frame_number < 0 or frame_number >= num_points:
+    #     return None  # Frame number out of range
+
+    if frame_number < 0:
         return None  # Frame number out of range
+    if (frame_number+1) >= num_points:
+        nextframe = 0
+    else:
+        nextframe = frame_number + 1
 
     # Calculate the tangent vector at the specified frame number
-    dx = X[frame_number + 1] - X[frame_number]
-    dy = Y[frame_number + 1] - Y[frame_number]
+    dx = X[nextframe] - X[frame_number]
+    dy = Y[nextframe] - Y[frame_number]
     magnitude = np.sqrt(dx**2 + dy**2)
 
     if magnitude == 0:
@@ -147,10 +154,7 @@ print(rec)
 RX, RY = zip(*rec)
 print(RX, RY)
 
-XCR,YCR= rotate_coordinates(XC,YC,angle_degrees,XC,YC)
-# print("Points")
-# print(XC,YC)
-# print(XCR,YCR)
+XCR, YCR = rotate_coordinates(XC, YC, angle_degrees, XC, YC)
 
 
 rec, = ax.plot(RX, RY, c='k')
@@ -166,6 +170,9 @@ car = ax.scatter(XCR, YCR, color='r')
 # that we are not doing yet
 ax.set_xlim(XCR-1.1*(height/2), XCR+1.1*(height/2))
 ax.set_ylim(YCR-width/2, YCR+width/2)
+
+ListX = []
+ListY = []
 
 # 6. Animate function
 def animate(frame):
@@ -187,7 +194,7 @@ def animate(frame):
     XRRotated, YRRotated = rotate_coordinates(data.loc[m3, 'XR'], data.loc[m3, 'YR'], angle_degrees, XC, YC)
 
     # modify the plots
-    # print(type(rec))
+
     rec.set_data(RX, RY)
     # LC.set_offsets([XRotated, YRotated])
     LC.set_offsets(np.column_stack((XRotated, YRotated)))
@@ -197,6 +204,8 @@ def animate(frame):
     LR.set_offsets(np.column_stack((XRRotated, YRRotated)))
     car.set_offsets([XCR, YCR])
     print(frame, XCR, YCR)
+    ListX.append(XCR)
+    ListY.append(YCR)
 
     # this will later be unnecessary
     ax.set_xlim(XCR-1.1*(height/2), XCR+1.1*(height/2))
@@ -205,21 +214,17 @@ def animate(frame):
     # return  rec,   LC, LL, LR, car,
     return LC,
 
-# animate(1)
 
 # 7. Call FuncAnimation
-
 animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1),
-                          blit=False)
+                          blit=False)  # False in order to allow the axis to move
 
 
 plt.show()
 
 
-
-
-
-
-
-plt.show()
-
+# fig2 = plt.figure()
+# plt.plot(ListX, ListY)
+# plt.grid()
+# plt.axis('equal')
+# plt.show()
