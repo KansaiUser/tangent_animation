@@ -50,7 +50,7 @@ def calculate_unit_tangent_vector(frame_number):
 
 
 # Function to check if points of the trajectory are in or out
-def isin(X, Y, theta):
+def isin(X, Y, theta, XC, YC):
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
     X = X - XC
@@ -135,9 +135,9 @@ ax.grid(True)
 # 5. Plot the dynamic features once
 
 # we apply the function to isolate the in points
-m1 = isin(data['X'], data['Y'], theta)
-m2 = isin(data['XL'], data['YL'], theta)
-m3 = isin(data['XR'], data['YR'], theta)
+m1 = isin(data['X'], data['Y'], theta, XC, YC)
+m2 = isin(data['XL'], data['YL'], theta, XC, YC)
+m3 = isin(data['XR'], data['YR'], theta, XC, YC)
 
 angle_degrees = 90 - math.degrees(theta)
 print("Angle :", angle_degrees)
@@ -173,9 +173,9 @@ def animate(frame):
     XC, YC = X[frame], Y[frame]
     XD, YD = tangent_vector
     theta, rectangle_x, rectangle_y = calculate_rectangle(XD, YD, XC, YC)
-    m1 = isin(data['X'], data['Y'], theta)
-    m2 = isin(data['XL'], data['YL'], theta)
-    m3 = isin(data['XR'], data['YR'], theta)
+    m1 = isin(data['X'], data['Y'], theta, XC, YC)
+    m2 = isin(data['XL'], data['YL'], theta, XC, YC)
+    m3 = isin(data['XR'], data['YR'], theta, XC, YC)
     angle_degrees = 90 - math.degrees(theta)
     rotate_with_parameters = lambda X, Y: rotate_coordinates(X, Y, angle_degrees, XC, YC)
     rec2 = list(map(rotate_with_parameters, rectangle_x, rectangle_y))
@@ -189,17 +189,23 @@ def animate(frame):
     # modify the plots
     # print(type(rec))
     rec.set_data(RX, RY)
-    LC.set_offsets([XRotated, YRotated])
-    LL.set_offsets([XLRotated, YLRotated])
-    LR.set_offsets([XRRotated, YRRotated])
+    # LC.set_offsets([XRotated, YRotated])
+    LC.set_offsets(np.column_stack((XRotated, YRotated)))
+    # LL.set_offsets([XLRotated, YLRotated])
+    LL.set_offsets(np.column_stack((XLRotated, YLRotated)))
+    # LR.set_offsets([XRRotated, YRRotated])
+    LR.set_offsets(np.column_stack((XRRotated, YRRotated)))
     car.set_offsets([XCR, YCR])
-    print(frame,XCR,YCR)
+    print(frame, XCR, YCR)
 
     # this will later be unnecessary
     ax.set_xlim(XCR-1.1*(height/2), XCR+1.1*(height/2))
     ax.set_ylim(YCR-width/2, YCR+width/2)
 
-    return rec, LC, LL, LR, car,
+    # return  rec,   LC, LL, LR, car,
+    return LC,
+
+# animate(1)
 
 # 7. Call FuncAnimation
 
