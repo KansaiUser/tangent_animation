@@ -146,7 +146,7 @@ rec1, = ax.plot(rectangle_x, rectangle_y, color='purple')
 # rec2 = ax.fill(rectangle_x, rectangle_y, color='purple', alpha=0.4)
 
 
-# 5. Modifies rec1,rec2 and tangent_vector
+# 6. Modifies rec1,rec2 and tangent_vector
 # receives frame
 def animate(frame):
     tangent_vector = calculate_unit_tangent_vector(frame)
@@ -167,6 +167,7 @@ def animate(frame):
 
     return tangent, car, rec1,# rec2,
 
+# 7. Call FuncAnimation
 
 animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1),
                           blit=True)
