@@ -139,20 +139,10 @@ ax.grid(True)
 if tangent_vector is not None:
     x_tangent, y_tangent = X[example_frame], Y[example_frame]
     dx, dy = tangent_vector
-    tangent = ax.quiver(
-        x_tangent,
-        y_tangent,
-        dx,
-        dy,
-        color="violet",
-        angles="xy",
-        scale_units="xy",
-        scale=1,
-        width=0.005,
-    )
+    tangent = ax.quiver(x_tangent, y_tangent, dx, dy, color='violet', angles='xy', scale_units='xy', scale=1, width=0.005)
 
-car = ax.scatter(XC, YC, color="r")
-(rec1,) = ax.plot(rectangle_x, rectangle_y, color="purple")
+car = ax.scatter(XC, YC, color='r')
+rec1, = ax.plot(rectangle_x, rectangle_y, color='purple')
 # rec2 = ax.fill(rectangle_x, rectangle_y, color='purple', alpha=0.4)
 
 
@@ -175,14 +165,13 @@ def animate(frame):
     # rec2.get_paths()[0].vertices[:, 0] = rectangle_x
     # rec2.get_paths()[0].vertices[:, 1] = rectangle_y
 
-    return (
-        tangent,
-        car,
-        rec1,
-    )  # rec2,
+    return tangent, car, rec1,# rec2,
 
 
-animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1), blit=True)
+animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1),
+                          blit=True)
 
 
 plt.show()
+
+
