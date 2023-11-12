@@ -93,7 +93,7 @@ height = 4
 # function to calculate the instantaneous rectangle
 def calculate_rectangle(XD, YD, XC, YC):
     theta = np.arctan2(YD, XD)
-    print("Angle:", math.degrees(theta))
+    # print("Angle:", math.degrees(theta))
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
 
@@ -162,7 +162,58 @@ XRRotated, YRRotated = rotate_coordinates(data.loc[m3, 'XR'], data.loc[m3, 'YR']
 LR = ax.scatter(XRRotated, YRRotated, c='g')
 car = ax.scatter(XCR, YCR, color='r')
 
-# ax.axis("equal")
-# ax.grid(True)
+# the following will not be necessary when we address the translation too
+# that we are not doing yet
+ax.set_xlim(XCR-1.1*(height/2), XCR+1.1*(height/2))
+ax.set_ylim(YCR-width/2, YCR+width/2)
+
+# 6. Animate function
+def animate(frame):
+    tangent_vector = calculate_unit_tangent_vector(frame)
+    XC, YC = X[frame], Y[frame]
+    XD, YD = tangent_vector
+    theta, rectangle_x, rectangle_y = calculate_rectangle(XD, YD, XC, YC)
+    m1 = isin(data['X'], data['Y'], theta)
+    m2 = isin(data['XL'], data['YL'], theta)
+    m3 = isin(data['XR'], data['YR'], theta)
+    angle_degrees = 90 - math.degrees(theta)
+    rotate_with_parameters = lambda X, Y: rotate_coordinates(X, Y, angle_degrees, XC, YC)
+    rec2 = list(map(rotate_with_parameters, rectangle_x, rectangle_y))
+
+    RX, RY = zip(*rec2)
+    XCR, YCR = rotate_coordinates(XC, YC, angle_degrees, XC, YC)
+    XRotated, YRotated = rotate_coordinates(data.loc[m1, 'X'], data.loc[m1, 'Y'], angle_degrees, XC, YC)
+    XLRotated, YLRotated = rotate_coordinates(data.loc[m2, 'XL'], data.loc[m2, 'YL'], angle_degrees, XC, YC)
+    XRRotated, YRRotated = rotate_coordinates(data.loc[m3, 'XR'], data.loc[m3, 'YR'], angle_degrees, XC, YC)
+
+    # modify the plots
+    # print(type(rec))
+    rec.set_data(RX, RY)
+    LC.set_offsets([XRotated, YRotated])
+    LL.set_offsets([XLRotated, YLRotated])
+    LR.set_offsets([XRRotated, YRRotated])
+    car.set_offsets([XCR, YCR])
+    print(frame,XCR,YCR)
+
+    # this will later be unnecessary
+    ax.set_xlim(XCR-1.1*(height/2), XCR+1.1*(height/2))
+    ax.set_ylim(YCR-width/2, YCR+width/2)
+
+    return rec, LC, LL, LR, car,
+
+# 7. Call FuncAnimation
+
+animation = FuncAnimation(fig, animate, frames=np.arange(0, num_points, 1),
+                          blit=False)
+
+
+plt.show()
+
+
+
+
+
+
+
 plt.show()
 
